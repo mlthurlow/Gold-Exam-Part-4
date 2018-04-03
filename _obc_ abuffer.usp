@@ -1,0 +1,107 @@
+/*******************************************************************************************
+  SIMPL+ Module Information
+*******************************************************************************************/
+/*
+CSP Name:   One Button Control www.onebuttoncontrol.com
+Programmer: Micah Thurlow micah@onebuttoncontrol.com
+Comments:	This module copyrighted by Micah Thurlow 2013. Use or modification of this module
+outside a Licensed System is strictly prohibited.  If you just give me a call at 469-585-0998
+I'd be happy to help and sell you some modules or help customize it for your particular use.
+*/
+
+/*******************************************************************************************
+  Compiler Directives
+*******************************************************************************************/
+// #ENABLE_DYNAMIC
+// #SYMBOL_NAME ""
+#HINT "Transitioning Analog Buffer"
+#DEFINE_CONSTANT		cMaxLines 255
+// #CATEGORY "" 
+#CATEGORY "1" // Analog Operations
+// #PRINT_TO_TRACE
+// #DIGITAL_EXPAND 
+#ANALOG_SERIAL_EXPAND	InputsWithOutputs	 
+// #OUTPUT_SHIFT 
+// #HELP_PDF_FILE ""
+#DEFAULT_VOLATILE
+#ENABLE_STACK_CHECKING
+#ENABLE_TRACE
+#ENCODING_ASCII
+// #ENCODING_UTF16
+// #ENCODING_INHERIT_FROM_PARENT
+// #ENCODING_INHERIT_FROM_PROGRAM
+/*
+#HELP_BEGIN
+   (add additional lines of help lines)
+#HELP_END
+*/
+
+/*******************************************************************************************
+  DIGITAL, ANALOG and SERIAL INPUTS and OUTPUTS
+*******************************************************************************************/
+DIGITAL_INPUT		enable; 
+ANALOG_INPUT		ain[cMaxLines]; 
+// STRING_INPUT 
+// BUFFER_INPUT 
+
+DIGITAL_OUTPUT 		_skip_;
+ANALOG_OUTPUT 		aout[cMaxLines];
+// STRING_OUTPUT 
+
+/*******************************************************************************************
+  Global Variables
+*******************************************************************************************/
+INTEGER		giNumLines;
+// LONG_INTEGER
+// SIGNED_INTEGER
+// SIGNED_LONG_INTEGER
+// STRING
+
+
+/*******************************************************************************************
+  Event Handlers
+*******************************************************************************************/
+PUSH enable
+{
+	integer		iCounter;
+
+	for (iCounter = 1 to giNumLines){
+    	aout[iCounter] = ain[iCounter];
+	} 
+}
+
+/*
+RELEASE input
+{
+    // TODO:  Add code here
+}
+*/
+
+CHANGE ain
+{
+	integer		iIndex;
+    
+	iIndex = getlastmodifiedarrayindex();
+	if(enable){
+    	aout[iIndex] = ain[iIndex];
+	}
+}
+
+/*******************************************************************************************
+  Main()
+*******************************************************************************************/
+Function Main()
+{
+    integer		iCounter;
+
+    WaitForInitializationComplete();
+
+	//Count back from max to determine lines
+    for (iCounter = cMaxLines to 1 step -1){
+    	if(issignaldefined(aout[iCounter])){
+    		giNumLines = iCounter;
+    		break;
+    	}
+    }
+}
+
